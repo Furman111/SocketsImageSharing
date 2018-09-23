@@ -1,9 +1,13 @@
+import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.net.ServerSocket
+import javax.imageio.ImageIO
 
 const val PORT = 1041
 const val BUFFER_SIZE = 4096
 const val SERVER_IMAGE_FILE = "/Users/stepanfurman/Desktop/Server/ImageFromClient.jpg"
+const val SERVER_RECOVERED_IMAGE_FILE = "/Users/stepanfurman/Desktop/Server/RecoveredImageFromClient.jpg"
 
 fun main(args: Array<String>) {
 
@@ -32,6 +36,25 @@ fun main(args: Array<String>) {
         }
         imageOS.close()
         println("The image saved\n")
+
+        println("Recovering image...")
+        val imageIS = FileInputStream(SERVER_IMAGE_FILE)
+        val image = ImageIO.read(imageIS)
+
+        for (i in 1 until image.raster.height - 1) {
+            for (j in 1 until image.raster.width - 1) {
+                val pixels = mutableListOf<Int>()
+                for (i1 in -1..1) {
+                    for (j1 in -1..1) {
+                        if (!(i1 == 0 && j1 == 0))
+                            pixels.add(image.getRGB(j + j1, i + i1))
+                    }
+                }
+                image.setRGB(j, i, pixels.sorted()[4])
+            }
+        }
+        ImageIO.write(image, "jpeg", File(SERVER_RECOVERED_IMAGE_FILE))
+        println("Recovered image is saved")
 
         socket.close()
         ss.close()
