@@ -1,3 +1,4 @@
+import java.awt.Color
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -50,7 +51,12 @@ fun main(args: Array<String>) {
                             pixels.add(image.getRGB(j + j1, i + i1))
                     }
                 }
-                image.setRGB(j, i, pixels.sorted()[4])
+                val colors = pixels.map { Color(it) }
+                val red = colors.map { it.red }.sorted()[4]
+                val green = colors.map { it.green }.sorted()[4]
+                val blue = colors.map { it.blue }.sorted()[4]
+                val alpha = colors.map { it.alpha }.sorted()[4]
+                image.setRGB(j, i, Color(red, green, blue, alpha).rgb)
             }
         }
         ImageIO.write(image, "jpeg", File(SERVER_RECOVERED_IMAGE_FILE))
